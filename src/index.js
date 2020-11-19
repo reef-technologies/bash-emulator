@@ -306,6 +306,8 @@ function defaultState () {
       }
     },
     user: 'user',
+    group: 'user',
+    host: 'localhost',
     workingDirectory: '/home/user'
   }
 }

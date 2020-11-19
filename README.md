@@ -113,6 +113,8 @@ __It's not recommended to access the state directly. Use the above defined helpe
 
 - `history` an array of strings containing previous commands
 - `user` name of the current user (defaults to `"user"`)
+- `group` name of the current group (defaults to `"group"`)
+- `host` name of the current host (defaults to `"localhost"`)
 - `workingDirectory` a string containing the current working directory (defaults to `/home/user`)
 - `fileSystem` an object that maps from absolute paths to directories or files.
   - Each value has a `type` property thats either `'dir'` or `'file'`

@@ -64,11 +64,8 @@ function ls (env, args) {
         }
         var date = new Date(stats.modified)
         var timestamp = date.toDateString().slice(4, 10) + ' ' + date.toTimeString().slice(0, 5)
-        // Manual aligning for now
-        if (type === 'dir') {
-          type += ' '
-        }
-        return type + '  ' + timestamp + '  ' + name
+        var chmod = (type === 'dir') ? 'drwxrwxr-x' : '-rw-rw-r--'
+        return chmod + ' ' + env.system.state.user + ' ' + env.system.state.group + ' ' + timestamp + '  ' + name
       })
     })).then(function (lines) {
       if (!longFormat) {
