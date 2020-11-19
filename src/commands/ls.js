@@ -52,21 +52,28 @@ function ls (env, args) {
   }
 
   function formatListing (base, listing) {
-    if (!longFormat) {
-      return Promise.resolve(listing.join(' '))
-    }
     return Promise.all(listing.map(function (filePath) {
       return env.system.stat(base + '/' + filePath).then(function (stats) {
+        var type = stats.type
+        var name = stats.name
+        if (type === 'dir') {
+          name = '\u001b[94m' + name + '\u001b[97m'
+        }
+        if (!longFormat) {
+          return name
+        }
         var date = new Date(stats.modified)
         var timestamp = date.toDateString().slice(4, 10) + ' ' + date.toTimeString().slice(0, 5)
-        var type = stats.type
         // Manual aligning for now
         if (type === 'dir') {
           type += ' '
         }
-        return type + '  ' + timestamp + '  ' + stats.name
+        return type + '  ' + timestamp + '  ' + name
       })
     })).then(function (lines) {
+      if (!longFormat) {
+        return lines.join(' ')
+      }
       return 'total ' + lines.length + '\n' + lines.join('\n')
     })
   }
