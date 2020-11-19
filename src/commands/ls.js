@@ -56,8 +56,9 @@ function ls (env, args) {
       return env.system.stat(base + '/' + filePath).then(function (stats) {
         var type = stats.type
         var name = stats.name
-        if (type === 'dir') {
-          name = '\u001b[94m' + name + '\u001b[97m'
+        var lsColor = env.system.state.addons.ls_colors[type]
+        if (lsColor) {
+          name = lsColor(name)
         }
         if (!longFormat) {
           return name

@@ -309,7 +309,10 @@ function defaultState () {
     user: 'user',
     group: 'user',
     host: 'localhost',
-    workingDirectory: '/home/user'
+    workingDirectory: '/home/user',
+    addons: {
+      ls_colors: {}
+    }
   }
 }
 

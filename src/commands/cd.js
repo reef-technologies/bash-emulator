@@ -5,7 +5,6 @@ function cd (env, args) {
   var path = args[0] || '/home/' + env.system.state.user
 
   env.system.stat(path).then(function (stats) {
-    console.log(stats)
     if (stats.type !== 'dir') {
       return Promise.reject('cd: not a directory: ' + path)
     }
