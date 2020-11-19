@@ -11,29 +11,35 @@ test('ls', function (t) {
     fileSystem: {
       '/': {
         type: 'dir',
-        modified: Date.now()
+        modified: Date.now(),
+        size: 4096
       },
       '/etc': {
         type: 'dir',
-        modified: new Date('Jun 27 2016 17:30').getTime()
+        modified: new Date('Jun 27 2016 17:30').getTime(),
+        size: 4096
       },
       '/home': {
         type: 'dir',
-        modified: new Date('Jul 23 2016 13:47').getTime()
+        modified: new Date('Jul 23 2016 13:47').getTime(),
+        size: 4096
       },
       '/home/test': {
         type: 'dir',
-        modified: Date.now()
+        modified: Date.now(),
+        size: 4096
       },
       '/home/test/README': {
         type: 'file',
         modified: new Date('Jan 01 2016 03:35').getTime(),
-        content: 'read this first'
+        content: 'read this first',
+        size: 123
       },
       '/home/test/.secret': {
         type: 'file',
         modified: new Date('May 14 2016 07:10').getTime(),
-        content: 'this file is hidden'
+        content: 'this file is hidden',
+        size: 456
       }
     }
   })
@@ -75,13 +81,9 @@ test('ls', function (t) {
     var listing =
       'total 2' +
       '\n' +
-      'dir   Jun 27 17:30  etc' +
+      'drwxrwxr-x test user  4096 Jun 27 17:30  etc' +
       '\n' +
-      'dir   Jul 23 13:47  home' +
-      '\n' +
-      'The output here is limited.' +
-      '\n' +
-      'On a real system you would also see file permissions, user, group, block size and more.'
+      'drwxrwxr-x test user  4096 Jul 23 13:47  home'
     t.equal(output, listing, 'more info with ls -l')
   })
 
@@ -89,13 +91,9 @@ test('ls', function (t) {
     var listing =
       'total 2' +
       '\n' +
-      'file  May 14 07:10  .secret' +
+      '-rw-rw-r-- test user   456 May 14 07:10  .secret' +
       '\n' +
-      'file  Jan 01 03:35  README' +
-      '\n' +
-      'The output here is limited.' +
-      '\n' +
-      'On a real system you would also see file permissions, user, group, block size and more.'
+      '-rw-rw-r-- test user   123 Jan 01 03:35  README'
     t.equal(output, listing, 'combine -a and -l')
   })
 
@@ -103,13 +101,9 @@ test('ls', function (t) {
     var listing =
       'total 2' +
       '\n' +
-      'file  May 14 07:10  .secret' +
+      '-rw-rw-r-- test user   456 May 14 07:10  .secret' +
       '\n' +
-      'file  Jan 01 03:35  README' +
-      '\n' +
-      'The output here is limited.' +
-      '\n' +
-      'On a real system you would also see file permissions, user, group, block size and more.'
+      '-rw-rw-r-- test user   123 Jan 01 03:35  README'
     t.equal(output, listing, 'combine -a and -l')
   })
 
@@ -117,13 +111,9 @@ test('ls', function (t) {
     var listing =
       'total 2' +
       '\n' +
-      'file  May 14 07:10  .secret' +
+      '-rw-rw-r-- test user   456 May 14 07:10  .secret' +
       '\n' +
-      'file  Jan 01 03:35  README' +
-      '\n' +
-      'The output here is limited.' +
-      '\n' +
-      'On a real system you would also see file permissions, user, group, block size and more.'
+      '-rw-rw-r-- test user   123 Jan 01 03:35  README'
     t.equal(output, listing, 'combine -a and -l')
   })
 })
