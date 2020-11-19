@@ -1,4 +1,4 @@
-// NOTE: No support for files yet
+var sprintf = require('sprintf-js').sprintf
 
 function ls (env, args) {
   // Ignore command name
@@ -65,7 +65,8 @@ function ls (env, args) {
         var date = new Date(stats.modified)
         var timestamp = date.toDateString().slice(4, 10) + ' ' + date.toTimeString().slice(0, 5)
         var chmod = (type === 'dir') ? 'drwxrwxr-x' : '-rw-rw-r--'
-        return chmod + ' ' + env.system.state.user + ' ' + env.system.state.group + ' ' + timestamp + '  ' + name
+        var size = sprintf('%5s', stats.size)
+        return chmod + ' ' + env.system.state.user + ' ' + env.system.state.group + ' ' + size + ' ' + timestamp + '  ' + name
       })
     })).then(function (lines) {
       if (!longFormat) {

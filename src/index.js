@@ -161,6 +161,7 @@ function bashEmulator (initialState) {
       return Promise.resolve({
         modified: state.fileSystem[filePath].modified,
         type: state.fileSystem[filePath].type,
+        size: state.fileSystem[filePath].size,
         name: pathParts[pathParts.length - 1]
       })
     },
