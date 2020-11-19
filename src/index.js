@@ -3,6 +3,7 @@ require('string.prototype.startswith')
 require('string.prototype.includes')
 require('string.prototype.repeat')
 var commands = require('./commands')
+var aliases = require('./aliases')
 
 function bashEmulator (initialState) {
   var state = createState(initialState)
@@ -26,6 +27,7 @@ function bashEmulator (initialState) {
 
   var emulator = {
     commands: commands,
+    aliases: aliases,
 
     state: state,
 
@@ -53,7 +55,7 @@ function bashEmulator (initialState) {
 
       var nonExistent = argsList.filter(function (args) {
         var cmd = args[0]
-        return !commands[cmd]
+        return !commands[cmd] && !aliases[cmd]
       })
       if (nonExistent.length) {
         return Promise.reject(nonExistent.map(function (args) {
@@ -66,6 +68,10 @@ function bashEmulator (initialState) {
       return new Promise(function (resolve, reject) {
         var pipes = argsList.map(function (args, idx) {
           var isLast = idx === argsList.length - 1
+          var alias = aliases[args[0]]
+          if (alias) {
+            args.splice(0, 1, ...alias)
+          }
           return commands[args[0]]({
             output: function (str) {
               if (isLast) {
