@@ -63,6 +63,9 @@ function ls (env, args) {
         if (!longFormat) {
           return name
         }
+        if (type === 'dir') {
+          name = name + '/'
+        }
         var date = new Date(stats.modified)
         var timestamp = date.toDateString().slice(4, 10) + ' ' + date.toTimeString().slice(0, 5)
         var chmod = (type === 'dir') ? 'drwxrwxr-x' : '-rw-rw-r--'

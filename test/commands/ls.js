@@ -81,9 +81,9 @@ test('ls', function (t) {
     var listing =
       'total 2' +
       '\n' +
-      'drwxrwxr-x test user  4096 Jun 27 17:30  etc' +
+      'drwxrwxr-x test user  4096 Jun 27 17:30  etc/' +
       '\n' +
-      'drwxrwxr-x test user  4096 Jul 23 13:47  home'
+      'drwxrwxr-x test user  4096 Jul 23 13:47  home/'
     t.equal(output, listing, 'more info with ls -l')
   })
 
