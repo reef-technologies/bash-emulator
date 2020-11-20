@@ -1,4 +1,5 @@
 var commands = {
+  alias: require('./alias'),
   cat: require('./cat'),
   cd: require('./cd'),
   cp: require('./cp'),

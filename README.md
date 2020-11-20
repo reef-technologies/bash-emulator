@@ -84,14 +84,17 @@ for bundling and minification in your own workflow.
   - Returns a Promise with a command, is `undefined` if no completion found
 - `commands`
   - An object with all commands that the emulator knows of
+- `aliases`
+  - An object with all aliases that the emulator knows of
 - `state`
   - [See below](#the-state-object)
 
 
-### Built-in features, commands and flags
+### Built-in features, commands, aliases and flags
 
 - pipes `|`
 - `ls -l -a`
+- `ll` (an alias of `ls -l`)
 - `cd`
 - `pwd`
 - `history`
@@ -110,6 +113,8 @@ __It's not recommended to access the state directly. Use the above defined helpe
 
 - `history` an array of strings containing previous commands
 - `user` name of the current user (defaults to `"user"`)
+- `group` name of the current group (defaults to `"group"`)
+- `host` name of the current host (defaults to `"localhost"`)
 - `workingDirectory` a string containing the current working directory (defaults to `/home/user`)
 - `fileSystem` an object that maps from absolute paths to directories or files.
   - Each value has a `type` property thats either `'dir'` or `'file'`

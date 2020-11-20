@@ -11,14 +11,17 @@ test('cd', function (t) {
     fileSystem: {
       '/': {
         type: 'dir',
+        size: '4096',
         modified: Date.now()
       },
       '/home': {
         type: 'dir',
+        size: '4096',
         modified: Date.now()
       },
       '/home/test': {
         type: 'dir',
+        size: '4096',
         modified: Date.now()
       }
     }
@@ -44,7 +47,7 @@ test('cd', function (t) {
       return emulator.run('cd nonexistent')
     })
     .then(null, function (err) {
-      t.equal(err, '/home/nonexistent: No such file or directory', 'error message')
+      t.equal(err, 'nonexistent: No such file or directory', 'error message')
     })
 })
 

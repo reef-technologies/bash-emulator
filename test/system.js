@@ -15,6 +15,8 @@ test('initialise with state', function (t) {
   var testState = {
     history: ['ls'],
     user: 'test',
+    group: 'test',
+    host: 'localhost',
     workingDirectory: '/home/test',
     fileSystem: {
       '/': {
@@ -29,6 +31,9 @@ test('initialise with state', function (t) {
         type: 'dir',
         modified: Date.now()
       }
+    },
+    addons: {
+      ls_colors: {}
     }
   }
   var emulator = bashEmulator(testState)
