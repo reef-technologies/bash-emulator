@@ -1,41 +1,25 @@
 var sprintf = require('sprintf-js').sprintf
 
+function getArg (args, argCode) {
+  const index = args.findIndex(function (arg) { return arg === argCode })
+  const valueFound = index !== -1
+  if (valueFound) {
+    args.splice(index, 1)
+  }
+  return valueFound
+}
+
 function ls (env, args) {
   // Ignore command name
   args.shift()
 
-  var aFlagIndex = args.findIndex(function (arg) {
-    return arg === '-a'
-  })
-  var showHidden = aFlagIndex !== -1
-  if (showHidden) {
-    args.splice(aFlagIndex, 1)
-  }
+  var showHidden = getArg(args, '-a')
+  var longFormat = getArg(args, '-l')
+  var entryPerRow = getArg(args, '-1')
 
-  var lFlagIndex = args.findIndex(function (arg) {
-    return arg === '-l'
-  })
-  var longFormat = lFlagIndex !== -1
-  if (longFormat) {
-    args.splice(lFlagIndex, 1)
-  }
-
-  var laFlagIndex = args.findIndex(function (arg) {
-    return arg === '-la'
-  })
-  if (laFlagIndex !== -1) {
+  if (getArg(args, '-la') || getArg(args, '-al')) {
     showHidden = true
     longFormat = true
-    args.splice(laFlagIndex, 1)
-  }
-
-  var alFlagIndex = args.findIndex(function (arg) {
-    return arg === '-al'
-  })
-  if (alFlagIndex !== -1) {
-    showHidden = true
-    longFormat = true
-    args.splice(alFlagIndex, 1)
   }
 
   if (!args.length) {
@@ -87,10 +71,13 @@ function ls (env, args) {
           return chmod + ' ' + env.system.state.user + ' ' + env.system.state.group + ' ' + size + ' ' + timestamp + '  ' + name
         })
       }).then(function (lines) {
-        if (!longFormat) {
+        if (longFormat) {
+          return 'total ' + lines.length + '\n' + lines.join('\n')
+        } else if (entryPerRow) {
+          return lines.join('\n')
+        } else {
           return lines.join(' ')
         }
-        return 'total ' + lines.length + '\n' + lines.join('\n')
       })
   }
 

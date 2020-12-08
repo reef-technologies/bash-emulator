@@ -2,7 +2,7 @@ var test = require('tape')
 var bashEmulator = require('../../src')
 
 test('ls', function (t) {
-  t.plan(10)
+  t.plan(11)
 
   var emulator = bashEmulator({
     history: [],
@@ -76,6 +76,10 @@ test('ls', function (t) {
 
   emulator.run('ls /home/test').then(function (output) {
     t.equal(output, 'dir README', 'list without hidden files')
+  })
+
+  emulator.run('ls -1 /home/test').then(function (output) {
+    t.equal(output, 'dir\nREADME', 'list entry per line')
   })
 
   emulator.run('ls -a /home/test').then(function (output) {
