@@ -51,33 +51,47 @@ function ls (env, args) {
     })
   }
 
+  function sortEntries (a, b) {
+    var isFirstDir = a.type === 'dir'
+    var isSecondDir = b.type === 'dir'
+    if (isFirstDir && !isSecondDir) return -1
+    if (!isFirstDir && isSecondDir) return 1
+    if (a.name < b.name) return -1
+    if (a.name > b.name) return 1
+    return 0
+  }
+
   function formatListing (base, listing) {
-    return Promise.all(listing.map(function (filePath) {
-      return env.system.stat(base + '/' + filePath).then(function (stats) {
-        var type = stats.type
-        var name = stats.name
-        var lsColor = env.system.state.addons.ls_colors[type]
-        if (lsColor) {
-          name = lsColor(name)
-        }
+    function getFileStats (filePath) { return env.system.stat(base + '/' + filePath) }
+
+    return Promise.all(listing.map(getFileStats))
+      .then(function (filesStats) {
+        filesStats.sort(sortEntries)
+        return filesStats.map(function (stats) {
+          var name = stats.name
+          var type = stats.type
+          var lsColor = env.system.state.addons.ls_colors[type]
+          if (lsColor) {
+            name = lsColor(name)
+          }
+          if (!longFormat) {
+            return name
+          }
+          if (type === 'dir') {
+            name = name + '/'
+          }
+          var date = new Date(stats.modified)
+          var timestamp = date.toDateString().slice(4, 10) + ' ' + date.toTimeString().slice(0, 5)
+          var chmod = (type === 'dir') ? 'drwxrwxr-x' : '-rw-rw-r--'
+          var size = sprintf('%5s', stats.size)
+          return chmod + ' ' + env.system.state.user + ' ' + env.system.state.group + ' ' + size + ' ' + timestamp + '  ' + name
+        })
+      }).then(function (lines) {
         if (!longFormat) {
-          return name
+          return lines.join(' ')
         }
-        if (type === 'dir') {
-          name = name + '/'
-        }
-        var date = new Date(stats.modified)
-        var timestamp = date.toDateString().slice(4, 10) + ' ' + date.toTimeString().slice(0, 5)
-        var chmod = (type === 'dir') ? 'drwxrwxr-x' : '-rw-rw-r--'
-        var size = sprintf('%5s', stats.size)
-        return chmod + ' ' + env.system.state.user + ' ' + env.system.state.group + ' ' + size + ' ' + timestamp + '  ' + name
+        return 'total ' + lines.length + '\n' + lines.join('\n')
       })
-    })).then(function (lines) {
-      if (!longFormat) {
-        return lines.join(' ')
-      }
-      return 'total ' + lines.length + '\n' + lines.join('\n')
-    })
   }
 
   Promise.all(args.sort().map(function (path) {

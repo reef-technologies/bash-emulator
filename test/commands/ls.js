@@ -40,6 +40,11 @@ test('ls', function (t) {
         modified: new Date('May 14 2016 07:10').getTime(),
         content: 'this file is hidden',
         size: 456
+      },
+      '/home/test/dir': {
+        type: 'dir',
+        modified: new Date('May 14 2016 07:10').getTime(),
+        size: 4096
       }
     }
   })
@@ -70,11 +75,11 @@ test('ls', function (t) {
   })
 
   emulator.run('ls /home/test').then(function (output) {
-    t.equal(output, 'README', 'list without hidden files')
+    t.equal(output, 'dir README', 'list without hidden files')
   })
 
   emulator.run('ls -a /home/test').then(function (output) {
-    t.equal(output, '.secret README', 'show hidden files with la -a')
+    t.equal(output, 'dir .secret README', 'show hidden files with la -a')
   })
 
   emulator.run('ls -l /').then(function (output) {
@@ -89,7 +94,9 @@ test('ls', function (t) {
 
   emulator.run('ls -l -a /home/test').then(function (output) {
     var listing =
-      'total 2' +
+      'total 3' +
+      '\n' +
+      'drwxrwxr-x test user  4096 May 14 07:10  dir/' +
       '\n' +
       '-rw-rw-r-- test user   456 May 14 07:10  .secret' +
       '\n' +
@@ -99,7 +106,9 @@ test('ls', function (t) {
 
   emulator.run('ls -la /home/test').then(function (output) {
     var listing =
-      'total 2' +
+      'total 3' +
+      '\n' +
+      'drwxrwxr-x test user  4096 May 14 07:10  dir/' +
       '\n' +
       '-rw-rw-r-- test user   456 May 14 07:10  .secret' +
       '\n' +
@@ -109,7 +118,9 @@ test('ls', function (t) {
 
   emulator.run('ls -al /home/test').then(function (output) {
     var listing =
-      'total 2' +
+      'total 3' +
+      '\n' +
+      'drwxrwxr-x test user  4096 May 14 07:10  dir/' +
       '\n' +
       '-rw-rw-r-- test user   456 May 14 07:10  .secret' +
       '\n' +
