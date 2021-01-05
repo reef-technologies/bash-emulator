@@ -177,7 +177,8 @@ function bashEmulator (initialState) {
           var dirPath = getPath(path)
           state.fileSystem[dirPath] = {
             type: 'dir',
-            modified: Date.now()
+            modified: Date.now(),
+            size: 4096  // directory dummy size
           }
         })
     },
@@ -200,12 +201,14 @@ function bashEmulator (initialState) {
           var oldContent = state.fileSystem[filePath].content
           state.fileSystem[filePath].content = oldContent + content
           state.fileSystem[filePath].modified = Date.now()
+          state.fileSystem[filePath].size = state.fileSystem[filePath].content.length
         }, function () {
           // file doesnt exist: write
           state.fileSystem[filePath] = {
             type: 'file',
             modified: Date.now(),
-            content: content
+            content: content,
+            size: content.length
           }
         })
       })
