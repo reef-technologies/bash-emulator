@@ -170,7 +170,6 @@ The API of the methods are designed to work with asynchronous implementations as
 - Make sure you have [node.js](https://nodejs.org/) installed
 - Setup project using `npm install`
 - Make sure tests are passing using `npm test`
-- Build the `bash-emulator.min.js` file with `npm run build`
 
 
 ## Contribution

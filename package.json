@@ -9,7 +9,6 @@
   },
   "homepage": "https://trybash.github.io/bash-emulator",
   "scripts": {
-    "build": "browserify src/browser-version.js | uglifyjs > bash-emulator.min.js",
     "test": "npm run lint && npm run cover",
     "lint": "standard",
     "cover": "istanbul cover --report html test/index.js && npm run check && echo 'For more see: coverage/index.html'",
@@ -40,10 +39,8 @@
     "sprintf-js": "^1.1.2"
   },
   "devDependencies": {
-    "browserify": "^14.0.0",
     "istanbul": "^0.4.3",
     "standard": "^8.0.0",
-    "tape": "^4.5.1",
-    "uglify-js": "^3.0.4"
+    "tape": "^4.5.1"
   }
 }
