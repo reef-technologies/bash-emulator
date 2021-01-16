@@ -2,7 +2,7 @@ var test = require('tape')
 var bashEmulator = require('../../src')
 
 test('clear', function (t) {
-  t.plan(2)
+  t.plan(4)
 
   var emulator = bashEmulator({
     workingDirectory: '/',
@@ -38,5 +38,17 @@ test('clear', function (t) {
   })
   .then(function (output) {
     t.equal(output, '', 'clear screen')
+  })
+  .then(function () {
+    return emulator.run('ls')
+  })
+  .then(function (output) {
+    t.equal(output, 'etc home', 'list directories')
+  })
+  .then(function () {
+    return emulator.run('cls')
+  })
+  .then(function (output) {
+    t.equal(output, '', 'clears screen using "cls" alias')
   })
 })
