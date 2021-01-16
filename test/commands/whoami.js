@@ -7,6 +7,6 @@ test('whoami', function (t) {
   var emulator = bashEmulator()
 
   emulator.run('whoami').then(function (output) {
-    t.equal(output, 'reef technologies', 'Company Name')
+    t.equal(output, 'Reef Technologies', 'Company Name')
   })
 })
