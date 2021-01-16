@@ -10,7 +10,8 @@ var commands = {
   pwd: require('./pwd'),
   rm: require('./rm'),
   rmdir: require('./rmdir'),
-  touch: require('./touch')
+  touch: require('./touch'),
+  clear: require('./clear')
 }
 
 module.exports = commands
