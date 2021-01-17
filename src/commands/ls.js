@@ -7,8 +7,10 @@ const LS_COMMAND_FLAGS = Object.freeze({
   ENTRY_PER_ROW: '1'
 })
 
+const FILE_TYPE_DIR = 'dir'
+
 function parseCommandFlagsAndArgs(commandArgs) {
-  let [commandFlags, args] = partition(commandArgs, arg => /-\w+/.test(arg))
+  const [commandFlags, args] = partition(commandArgs, arg => /-\w+/.test(arg))
   
   if (args.length === 0) { args.push('.') }
 
@@ -31,8 +33,8 @@ function ls (env, commandOptions) {
   const entryPerRow = flags.has(LS_COMMAND_FLAGS.ENTRY_PER_ROW)
 
   function sortEntries (a, b) {
-    var isFirstDir = a.type === 'dir'
-    var isSecondDir = b.type === 'dir'
+    var isFirstDir = a.type === FILE_TYPE_DIR
+    var isSecondDir = b.type === FILE_TYPE_DIR
     if (isFirstDir && !isSecondDir) return -1
     if (!isFirstDir && isSecondDir) return 1
     if (a.name < b.name) return -1
@@ -58,7 +60,7 @@ function ls (env, commandOptions) {
       return `${day} ${hour}`
     }
 
-    const getChmod = fileType => (fileType === 'dir') ? 'drwxrwxr-x' : '-rw-rw-r--'
+    const getChmod = fileType => (fileType === FILE_TYPE_DIR) ? 'drwxrwxr-x' : '-rw-rw-r--'
 
     return Promise.all(listing.map(getFileStats))
       .then(filesStats => {
@@ -74,7 +76,7 @@ function ls (env, commandOptions) {
           if (!longFormat) {
             return name
           }
-          if (type === 'dir') {
+          if (type === FILE_TYPE_DIR) {
             name = name + '/'
           }
           const date = new Date(stats.modified)
