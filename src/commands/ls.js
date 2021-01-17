@@ -28,7 +28,7 @@ function ls (env, commandOptions) {
   }
 
   function formatListing (basePath, listing) {
-    const listings = listing.map(filePath => env.system.stat(`${basePath}/${filePath}`))
+    const listingStats = listing.map(filePath => env.system.stat(`${basePath}/${filePath}`))
 
     const applyAddonsForStatsName = ({ type, name }) => {
       const lsColor = env.system.state.addons.ls_colors[type]
@@ -79,7 +79,7 @@ function ls (env, commandOptions) {
       return lines.join(' ')
     }
 
-    return Promise.all(listings)
+    return Promise.all(listingStats)
       .then(filesStats => filesStats
         .sort(sortFileStatsEntries)
         .map(formatFileStatsEntries)
@@ -87,7 +87,7 @@ function ls (env, commandOptions) {
   }
 
   const rejectHiddenListings = listing => showHiddenFiles ? listing : listing.filter(l => !l.startsWith('.'))
-  const listings = args
+  const formattedListings = args
     .sort()
     .map(path => env.system.readDir(path)
       .then(rejectHiddenListings)
@@ -95,7 +95,7 @@ function ls (env, commandOptions) {
       .then(listing => args.length === 1 ? listing : `${path}:\n${listing}`)
     )
 
-  Promise.all(listings)
+  Promise.all(formattedListings)
     .then(listings => listings.join('\n\n'))
     .then(result => {
       env.output(result)
