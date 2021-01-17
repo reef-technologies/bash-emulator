@@ -34,6 +34,14 @@ function bashEmulator (initialState) {
     run: function (input) {
       state.history.push(input)
 
+      // NOTE: we handle cat command without operand case here
+      // because expressions like 'pwd | cat' are legal
+      // and we can't just check for empty arguments
+      // inside cat command and throw exception
+      if (input.trim() === 'cat') {
+        return Promise.reject('cat: missing operand')
+      }
+
       var argsList = input.split('|').map(function (pipe) {
         var args = pipe.trim().split(' ').filter(function (s) {
           return s

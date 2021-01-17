@@ -49,6 +49,22 @@ test('run missing command', function (t) {
   })
 })
 
+test('run cat command without operand', function (t) {
+  t.plan(3)
+
+  bashEmulator().run('cat').then(null, function (err) {
+    t.equals(err, 'cat: missing operand')
+  })
+
+  bashEmulator().run('cat  ').then(null, function (err) {
+    t.equals(err, 'cat: missing operand')
+  })
+
+  bashEmulator().run('cat\n\n').then(null, function (err) {
+    t.equals(err, 'cat: missing operand')
+  })
+})
+
 test('run empty', function (t) {
   t.plan(1)
 
