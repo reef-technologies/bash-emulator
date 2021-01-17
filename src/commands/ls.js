@@ -2,7 +2,7 @@ const sprintf = require('sprintf-js').sprintf
 const parseCommandArgs = require('../utils/parseCommandArgs')
 
 const LS_COMMAND_FLAGS = Object.freeze({
-  SHOW_HIDDEN: 'a',
+  SHOW_HIDDEN_FILES: 'a',
   SHOW_ENTRY_PER_ROW: '1',
   USE_LONG_FORMAT: 'l'
 })
@@ -16,9 +16,16 @@ function ls (env, commandOptions) {
 
   if (args.length === 0) { args.push('.') }
 
-  const showHidden = flags.includes(LS_COMMAND_FLAGS.SHOW_HIDDEN)
-  const showEntryPerRow = flags.includes(LS_COMMAND_FLAGS.SHOW_ENTRY_PER_ROW)
-  const useLongFormat = flags.includes(LS_COMMAND_FLAGS.USE_LONG_FORMAT)
+  const showHiddenFiles = flags.includes(LS_COMMAND_FLAGS.SHOW_HIDDEN_FILES)
+  let showEntryPerRow = flags.includes(LS_COMMAND_FLAGS.SHOW_ENTRY_PER_ROW)
+  let useLongFormat = flags.includes(LS_COMMAND_FLAGS.USE_LONG_FORMAT)
+
+  // if both flags are enabled then choose the last one
+  if (showEntryPerRow && useLongFormat) {
+    useLongFormat = flags.lastIndexOf(LS_COMMAND_FLAGS.USE_LONG_FORMAT) >
+      flags.lastIndexOf(LS_COMMAND_FLAGS.SHOW_ENTRY_PER_ROW)
+    showEntryPerRow = !useLongFormat
+  }
 
   function formatListing (basePath, listing) {
     const listings = listing.map(filePath => env.system.stat(`${basePath}/${filePath}`))
@@ -79,7 +86,7 @@ function ls (env, commandOptions) {
       ).then(joinFileStatsEntriesLines)
   }
 
-  const rejectHiddenListings = listing => showHidden ? listing : listing.filter(l => !l.startsWith('.'))
+  const rejectHiddenListings = listing => showHiddenFiles ? listing : listing.filter(l => !l.startsWith('.'))
   const listings = args
     .sort()
     .map(path => env.system.readDir(path)
