@@ -1,39 +1,34 @@
-var sprintf = require('sprintf-js').sprintf
+const sprintf = require('sprintf-js').sprintf
+const partition = require('lodash.partition')
 
-function getArg (args, argCode) {
-  const index = args.findIndex(function (arg) { return arg === argCode })
-  const valueFound = index !== -1
-  if (valueFound) {
-    args.splice(index, 1)
-  }
-  return valueFound
+const LS_COMMAND_FLAGS = Object.freeze({
+  SHOW_HIDDEN: 'a',
+  LONG_FORMAT: 'l',
+  ENTRY_PER_ROW: '1'
+})
+
+function parseCommandFlagsAndArgs(commandArgs) {
+  let [commandFlags, args] = partition(commandArgs, arg => /-\w+/.test(arg))
+  
+  if (args.length === 0) { args.push('.') }
+
+  const uniqueFlags = new Set(
+    commandFlags.map(arg => arg.substring(1))
+      .join('')
+      .split('')
+  )
+  return [uniqueFlags, args]
 }
 
-function ls (env, args) {
+function ls (env, commandOptions) {
   // Ignore command name
-  args.shift()
+  commandOptions.shift()
 
-  var showHidden = getArg(args, '-a')
-  var longFormat = getArg(args, '-l')
-  var entryPerRow = getArg(args, '-1')
-
-  if (getArg(args, '-la') || getArg(args, '-al')) {
-    showHidden = true
-    longFormat = true
-  }
-
-  if (!args.length) {
-    args.push('.')
-  }
-
-  function excludeHidden (listing) {
-    if (showHidden) {
-      return listing
-    }
-    return listing.filter(function (item) {
-      return item[0] !== '.'
-    })
-  }
+  let [flags, args] = parseCommandFlagsAndArgs(commandOptions)
+  
+  const showHidden = flags.has(LS_COMMAND_FLAGS.SHOW_HIDDEN)
+  const longFormat = flags.has(LS_COMMAND_FLAGS.LONG_FORMAT)
+  const entryPerRow = flags.has(LS_COMMAND_FLAGS.ENTRY_PER_ROW)
 
   function sortEntries (a, b) {
     var isFirstDir = a.type === 'dir'
@@ -46,15 +41,33 @@ function ls (env, args) {
   }
 
   function formatListing (base, listing) {
-    function getFileStats (filePath) { return env.system.stat(base + '/' + filePath) }
+    const getFileStats = filePath => env.system.stat(`${base}/${filePath}`)
+    const formatLines = lines => {
+      if (longFormat) {
+        return `total ${lines.length}\n${lines.join('\n')}`
+      } else if (entryPerRow) {
+        return lines.join('\n')
+      }
+      return lines.join(' ')
+    }
+
+    const extractTimestamp = date => {
+      const dateString = date.toString()
+      const day = dateString.match(/(\w+\s\d+)/)[1]
+      const hour = dateString.match(/(\d+:\d+)/)[1]
+      return `${day} ${hour}`
+    }
+
+    const getChmod = fileType => (fileType === 'dir') ? 'drwxrwxr-x' : '-rw-rw-r--'
 
     return Promise.all(listing.map(getFileStats))
-      .then(function (filesStats) {
+      .then(filesStats => {
         filesStats.sort(sortEntries)
-        return filesStats.map(function (stats) {
-          var name = stats.name
-          var type = stats.type
-          var lsColor = env.system.state.addons.ls_colors[type]
+        return filesStats.map(stats => {
+          const type = stats.type
+          const lsColor = env.system.state.addons.ls_colors[type]
+
+          let name = stats.name
           if (lsColor) {
             name = lsColor(name)
           }
@@ -64,43 +77,33 @@ function ls (env, args) {
           if (type === 'dir') {
             name = name + '/'
           }
-          var date = new Date(stats.modified)
-          var timestamp = date.toDateString().slice(4, 10) + ' ' + date.toTimeString().slice(0, 5)
-          var chmod = (type === 'dir') ? 'drwxrwxr-x' : '-rw-rw-r--'
-          var size = sprintf('%5s', stats.size)
-          return chmod + ' ' + env.system.state.user + ' ' + env.system.state.group + ' ' + size + ' ' + timestamp + '  ' + name
+          const date = new Date(stats.modified)
+          const timestamp = extractTimestamp(date)
+          const chmod = getChmod(type)
+          const size = sprintf('%5s', stats.size)
+          return `${chmod} ${env.system.state.user} ${env.system.state.group} ${size} ${timestamp}  ${name}`
         })
-      }).then(function (lines) {
-        if (longFormat) {
-          return 'total ' + lines.length + '\n' + lines.join('\n')
-        } else if (entryPerRow) {
-          return lines.join('\n')
-        } else {
-          return lines.join(' ')
-        }
-      })
+      }).then(formatLines)
   }
 
-  Promise.all(args.sort().map(function (path) {
+  const excludeHidden = listing => showHidden ? listing : listing.filter(l => !l.startsWith('.'))
+
+  Promise.all(args.sort().map(path => {
     return env.system.readDir(path)
       .then(excludeHidden)
-      .then(function (listing) {
-        return formatListing(path, listing)
-      })
-      .then(function (formattedListing) {
+      .then(listing => formatListing(path, listing))
+      .then(formattedListing => {
         if (args.length === 1) {
           return formattedListing
         }
-        return path + ':\n' + formattedListing
+        return `${path}:\n${formattedListing}`
       })
   }))
-  .then(function (listings) {
-    return listings.join('\n\n')
-  })
-  .then(function (result) {
+  .then(listings => listings.join('\n\n'))
+  .then(result => {
     env.output(result)
     env.exit()
-  }, function (err) {
+  }, err => {
     env.output('ls: ' + err)
     env.exit(2)
   })
