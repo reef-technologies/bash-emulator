@@ -2,7 +2,7 @@ var test = require('tape')
 var bashEmulator = require('../../src')
 
 test('ls', function (t) {
-  t.plan(11)
+  t.plan(17)
 
   var emulator = bashEmulator({
     history: [],
@@ -130,6 +130,38 @@ test('ls', function (t) {
       '\n' +
       '-rw-rw-r-- test user   123 Jan 01 03:35  README'
     t.equal(output, listing, 'combine -a and -l')
+  })
+
+  emulator.run('ls -a -1 /home/test').then(function (output) {
+    t.equal(output, 'dir\n.secret\nREADME', 'list all & entry per line')
+  })
+
+  emulator.run('ls -a1 /home/test').then(function (output) {
+    t.equal(output, 'dir\n.secret\nREADME', 'list all & entry per line combined flags')
+  })
+
+  emulator.run('ls -1a /home/test').then(function (output) {
+    t.equal(output, 'dir\n.secret\nREADME', 'list all & entry per line combined flags reverse order')
+  })
+
+  emulator.run('ls -l -a -1 /home/test').then(function (output) {
+    t.equal(output, 'dir\n.secret\nREADME', 'use all flags -l -a and -1 separate')
+  })
+
+  emulator.run('ls -la1 /home/test').then(function (output) {
+    t.equal(output, 'dir\n.secret\nREADME', 'use all flags -l -a and -1 combined')
+  })
+
+  emulator.run('ls -la1 -l /home/test').then(function (output) {
+    var listing =
+      'total 3' +
+      '\n' +
+      'drwxrwxr-x test user  4096 May 14 07:10  dir/' +
+      '\n' +
+      '-rw-rw-r-- test user   456 May 14 07:10  .secret' +
+      '\n' +
+      '-rw-rw-r-- test user   123 Jan 01 03:35  README'
+    t.equal(output, listing, 'use all flags -l -a -1 combined overwrite with -1 (duplicate flag)')
   })
 })
 
