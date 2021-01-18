@@ -1,5 +1,5 @@
 function whoami (env) {
-  env.output('Reef Technologies')
+  env.output(env.system.state.user)
   env.exit()
 }
 
