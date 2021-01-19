@@ -49,8 +49,8 @@ test('run missing command', function (t) {
   })
 })
 
-test('run cat command without operand', function (t) {
-  t.plan(3)
+test('run cat command and its aliases without operand', function (t) {
+  t.plan(9)
 
   bashEmulator().run('cat').then(null, function (err) {
     t.equals(err, 'cat: missing operand')
@@ -62,6 +62,30 @@ test('run cat command without operand', function (t) {
 
   bashEmulator().run('cat\n\n').then(null, function (err) {
     t.equals(err, 'cat: missing operand')
+  })
+
+  bashEmulator().run('less').then(null, function (err) {
+    t.equals(err, 'less: missing operand')
+  })
+
+  bashEmulator().run('less  ').then(null, function (err) {
+    t.equals(err, 'less: missing operand')
+  })
+
+  bashEmulator().run('less\n\n').then(null, function (err) {
+    t.equals(err, 'less: missing operand')
+  })
+
+  bashEmulator().run('more').then(null, function (err) {
+    t.equals(err, 'more: missing operand')
+  })
+
+  bashEmulator().run('more  ').then(null, function (err) {
+    t.equals(err, 'more: missing operand')
+  })
+
+  bashEmulator().run('more\n\n').then(null, function (err) {
+    t.equals(err, 'more: missing operand')
   })
 })
 

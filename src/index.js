@@ -34,12 +34,13 @@ function bashEmulator (initialState) {
     run: function (input) {
       state.history.push(input)
 
-      // NOTE: we handle cat command without operand case here
+      // NOTE: we handle cat command (with its aliases) without operand case here
       // because expressions like 'pwd | cat' are legal
       // and we can't just check for empty arguments
       // inside cat command and throw exception
-      if (input.trim() === 'cat') {
-        return Promise.reject('cat: missing operand')
+      const command = input.trim()
+      if (['cat', 'less', 'more'].includes(command)) {
+        return Promise.reject(`${command}: missing operand`)
       }
 
       var argsList = input.split('|').map(function (pipe) {
